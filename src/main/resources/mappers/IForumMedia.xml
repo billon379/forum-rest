@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 帖子相关的媒体文件 -->
+<mapper namespace="fun.billon.forum.dao.IForumMediaDAO">
+
+    <!-- 新增帖子相关的媒体文件 -->
+    <insert id="insertForumMedias" parameterType="java.util.List">
+        INSERT INTO forum_media(post_id,`type`,cover,url,`desc`,sort,visiable)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.postId},#{item.type},#{item.cover},#{item.url},#{item.desc},#{item.sort},#{item.visiable})
+        </foreach>
+    </insert>
+
+    <!-- 删除帖子相关的媒体文件 -->
+    <delete id="deleteForumMediaByPK" parameterType="ForumMediaModel">
+        UPDATE FROM forum_media
+        <set>
+            delete_time = NOW(),
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+
+    <!-- 修改帖子相关的媒体文件 -->
+    <update id="updateForumMediaByPK" parameterType="ForumMediaModel">
+        UPDATE forum_media
+        <set>
+            <if test="type > 0">
+                type = #{type},
+            </if>
+            <if test="cover != null">
+                cover = #{cover},
+            </if>
+            <if test="url != null">
+                url = #{url},
+            </if>
+            <if test="desc != null">
+                `desc` = #{desc},
+            </if>
+            <if test="sort > 0">
+                sort = #{sort},
+            </if>
+            <if test="visiable > 0">
+                visiable = #{visiable},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+            <if test="postId > 0">
+                AND post_id = #{postId}
+            </if>
+        </where>
+    </update>
+
+    <!-- 根据条件获取id集合 -->
+    <select id="queryPKListByCriteria" parameterType="ForumMediaModel" resultType="Integer">
+        SELECT id FROM forum_media
+        <where>
+            delete_time IS NULL
+            AND post_id = #{postId}
+        </where>
+    </select>
+
+    <!-- 根据id查询帖子相关的媒体文件 -->
+    <select id="queryForumMediaByPK" parameterType="ForumMediaModel"
+            resultMap="resultForumMedia">
+        SELECT
+        <include refid="forumMediaMapping"/>
+        FROM forum_media
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <!-- 查询字段映射 begin-->
+    <!-- 帖子相关的媒体文件 查询字段映射(forum_media) -->
+    <sql id="forumMediaMapping">
+        id, post_id, `type`, cover, url, `desc`, sort, visiable, create_time, delete_time
+    </sql>
+    <!-- 查询字段映射 end-->
+
+    <!-- 查询结果映射begin -->
+    <!-- 帖子相关的媒体文件映射 -->
+    <resultMap id="resultForumMedia" type="ForumMediaModel">
+        <id property="id" column="id"/>
+        <result property="postId" column="post_id"/>
+        <result property="type" column="type"/>
+        <result property="cover" column="cover"/>
+        <result property="url" column="url"/>
+        <result property="desc" column="desc"/>
+        <result property="sort" column="sort"/>
+        <result property="visiable" column="visiable"/>
+        <result property="createTime" column="create_time"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+    <!-- 查询结果映射end -->
+
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 论坛话题 -->
+<mapper namespace="fun.billon.forum.dao.IForumTopicDAO">
+
+    <!-- 新增论坛话题 -->
+    <insert id="insertForumTopic" parameterType="ForumTopicModel" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO forum_topic (title)
+        VALUES (#{title})
+    </insert>
+
+    <!-- 删除论坛话题 -->
+    <update id="deleteForumTopicByPK" parameterType="ForumTopicModel">
+        UPDATE forum_topic
+        <set>
+            delete_time = NOW(),
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <!-- 修改论坛话题 -->
+    <update id="updateForumTopicByPK" parameterType="ForumTopicModel">
+        UPDATE forum_topic
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <!-- 根据特定条件查询论坛话题主键集合 -->
+    <select id="queryPKListByCriteria" parameterType="ForumTopicModel" resultType="Integer">
+        SELECT id FROM forum_topic
+        <where>
+            delete_time IS NULL
+        </where>
+    </select>
+
+    <!-- 根据id查询论坛话题 -->
+    <select id="queryForumTopicByPK" parameterType="ForumTopicModel"
+            resultMap="resultForumTopic">
+        SELECT
+        <include refid="forumTopicMapping"/>
+        FROM forum_topic
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <!-- 查询字段映射 begin-->
+    <!-- 论坛话题 查询字段映射(forum_topic) -->
+    <sql id="forumTopicMapping">
+        id, title, create_time, delete_time
+    </sql>
+    <!-- 查询字段映射 end-->
+
+    <!-- 查询结果映射begin -->
+    <!-- 论坛话题映射 -->
+    <resultMap id="resultForumTopic" type="ForumTopicModel">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="createTime" column="create_time"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+    <!-- 查询结果映射end -->
+
+</mapper>

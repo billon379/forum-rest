@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 论坛回复记录 -->
+<mapper namespace="fun.billon.forum.dao.IForumReplyDAO">
+
+    <!-- 新增论坛回复记录 -->
+    <insert id="insertForumReply" parameterType="ForumReplyModel" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO forum_reply (post_id, uid, ref_id, content)
+        VALUES (#{postId}, #{uid}, #{refId}, #{content})
+    </insert>
+
+    <!-- 删除论坛回复记录 -->
+    <update id="deleteForumReplyByPK" parameterType="ForumReplyModel">
+        UPDATE forum_reply
+        <set>
+            delete_time = NOW(),
+        </set>
+        <where>
+            id = #{id}
+            <if test="uid > 0">
+                AND uid = #{uid}
+            </if>
+        </where>
+    </update>
+
+    <!-- 根据条件获取id集合 -->
+    <select id="queryPKListByCriteria" parameterType="ForumReplyModel" resultType="Integer">
+        SELECT id FROM forum_reply
+        <where>
+            delete_time IS NULL
+            AND post_id = #{postId}
+        </where>
+        ORDER BY id DESC
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!-- 根据id查询论坛回复记录 -->
+    <select id="queryForumReplyByPK" parameterType="ForumReplyModel"
+            resultMap="resultForumReply">
+        SELECT
+        <include refid="forumReplyMapping"/>
+        FROM forum_reply
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <!-- 查询字段映射 begin-->
+    <!-- 论坛回复记录 查询字段映射(forum_reply) -->
+    <sql id="forumReplyMapping">
+        id, post_id, uid, ref_id, content, create_time, delete_time
+    </sql>
+    <!-- 查询字段映射 end-->
+
+    <!-- 查询结果映射begin -->
+    <!-- 论坛回复记录映射 -->
+    <resultMap id="resultForumReply" type="ForumReplyModel">
+        <id property="id" column="id"/>
+        <result property="postId" column="post_id"/>
+        <result property="uid" column="uid"/>
+        <result property="refId" column="ref_id"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="create_time"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+    <!-- 查询结果映射end -->
+
+</mapper>

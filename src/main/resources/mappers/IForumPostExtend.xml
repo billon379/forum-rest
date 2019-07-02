@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 帖子数量统计 -->
+<mapper namespace="fun.billon.forum.dao.IForumPostExtendDAO">
+
+    <!-- 新增帖子数量统计 -->
+    <insert id="insertForumPostExtend" parameterType="ForumPostExtendModel"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO forum_post_extend (post_id, read_num, praise_num, shared_num, reply_num, pay_num)
+        VALUES (#{postId}, #{readNum}, #{praiseNum}, #{sharedNum}, #{replyNum}, #{payNum})
+    </insert>
+
+    <!-- 修改帖子数量统计 -->
+    <update id="updateForumPostExtendByPK" parameterType="ForumPostExtendModel">
+        UPDATE forum_post_extend
+        <set>
+            <if test="readNum > 0">
+                read_num = #{readNum},
+            </if>
+            <if test="praiseNum > 0">
+                praise_num = #{praiseNum},
+            </if>
+            <if test="sharedNum > 0">
+                shared_num = #{sharedNum},
+            </if>
+            <if test="replyNum > 0">
+                reply_num = #{replyNum},
+            </if>
+            <if test="payNum > 0">
+                pay_num = #{payNum},
+            </if>
+        </set>
+        <where>
+            post_id = #{postId}
+        </where>
+    </update>
+
+    <!-- 修改帖子数量统计数字加减-->
+    <update id="updateForumPostExtendNumStepedByPK" parameterType="ForumPostExtendModel">
+        UPDATE forum_post_extend
+        <set>
+            <if test="readNum > 0">
+                read_num = read_num + 1,
+            </if>
+            <if test="sharedNum > 0">
+                shared_num = shared_num + 1,
+            </if>
+            <if test="praiseNum > 0">
+                praise_num = praise_num + 1,
+            </if>
+            <if test="0 > praiseNum">
+                praise_num = praise_num - 1,
+            </if>
+            <if test="replyNum > 0">
+                reply_num = reply_num + 1,
+            </if>
+            <if test="0 > replyNum">
+                reply_num = reply_num - 1,
+            </if>
+            <if test="payNum > 0">
+                pay_num = pay_num + 1,
+            </if>
+        </set>
+        <where>
+            post_id = #{postId}
+        </where>
+    </update>
+
+    <!-- 查询帖子附属信息 -->
+    <select id="queryForumPostExtendByPK" parameterType="ForumPostExtendModel"
+            resultMap="resultForumPostExtend">
+        SELECT
+        <include refid="forumPostExtendMapping"/>
+        FROM forum_post_extend
+        <where>
+            post_id = #{postId}
+        </where>
+    </select>
+
+    <!-- 查询字段映射 begin-->
+    <!-- 帖子数量统计 查询字段映射(forum_post_extend) -->
+    <sql id="forumPostExtendMapping">
+        post_id, read_num, praise_num, shared_num, reply_num, pay_num
+    </sql>
+    <!-- 查询字段映射 end-->
+
+    <!-- 查询结果映射begin -->
+    <!-- 帖子数量统计映射 -->
+    <resultMap id="resultForumPostExtend" type="ForumPostExtendModel">
+        <id property="postId" column="post_id"/>
+        <result property="readNum" column="read_num"/>
+        <result property="praiseNum" column="praise_num"/>
+        <result property="sharedNum" column="shared_num"/>
+        <result property="replyNum" column="reply_num"/>
+        <result property="payNum" column="pay_num"/>
+    </resultMap>
+    <!-- 查询结果映射end -->
+
+</mapper>

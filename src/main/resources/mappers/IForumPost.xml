@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 论坛帖子 -->
+<mapper namespace="fun.billon.forum.dao.IForumPostDAO">
+
+    <!-- 新增论坛帖子 -->
+    <insert id="insertForumPost" parameterType="ForumPostModel" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO forum_post (topic_id, title, content, uid, lat, lng, address, `status`,
+                                `limit`, price, expired_time, payment)
+        VALUES (#{topicId}, #{title}, #{content}, #{uid}, #{lat}, #{lng}, #{address}, #{status},
+                #{limit}, #{price}, #{expiredTime}, #{payment})
+    </insert>
+
+    <!-- 删除论坛帖子 -->
+    <update id="deleteForumPostByPK" parameterType="ForumPostModel">
+        UPDATE forum_post
+        <set>
+            delete_time = NOW(),
+        </set>
+        <where>
+            id = #{id}
+            <if test="uid > 0">
+                AND uid = #{uid}
+            </if>
+        </where>
+    </update>
+
+    <!-- 修改论坛帖子 -->
+    <update id="updateForumPostByPK" parameterType="ForumPostModel">
+        UPDATE forum_post
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="status > 0">
+                `status` = #{status},
+            </if>
+            <if test="limit > 0">
+                `limit` = #{limit},
+            </if>
+            <if test="price > 0">
+                price = #{price},
+            </if>
+            <if test="expiredTime != null">
+                expired_time = #{expiredTime},
+            </if>
+            <if test="payment != null">
+                payment = #{payment},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <!-- 根据条件查询记录总数 -->
+    <select id="queryPKListCountByCriteria" parameterType="ForumPostModel"
+            resultType="Integer">
+        SELECT COUNT(*) FROM forum_post
+        <where>
+            delete_time IS NULL
+            AND (expired_time IS NULL OR expired_time > NOW())
+            <if test="topicId > 0">
+                AND topic_id = #{topicId}
+            </if>
+            <if test="uid > 0">
+                AND uid = #{uid}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据条件获取id集合 -->
+    <select id="queryPKListByCriteria" parameterType="ForumPostModel" resultType="Integer">
+        SELECT id FROM forum_post
+        <where>
+            delete_time IS NULL
+            AND (expired_time IS NULL OR expired_time > NOW())
+            <if test="topicId > 0">
+                AND topic_id = #{topicId}
+            </if>
+            <if test="uid > 0">
+                AND uid = #{uid}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!-- 根据id查询论坛帖子 -->
+    <select id="queryForumPostByPK" parameterType="ForumPostModel"
+            resultMap="resultForumPost">
+        SELECT
+        <include refid="forumPostMapping"/>
+        FROM forum_post
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <!-- 查询字段映射 begin-->
+    <!-- 论坛帖子 查询字段映射(forum_post) -->
+    <sql id="forumPostMapping">
+        id, topic_id, title, content, uid, lat, lng, address, `status`, `limit`,
+        price, expired_time, payment, create_time, delete_time
+    </sql>
+    <!-- 查询字段映射 end-->
+
+    <!-- 查询结果映射begin -->
+    <!-- 论坛帖子映射 -->
+    <resultMap id="resultForumPost" type="ForumPostModel">
+        <id property="id" column="id"/>
+        <result property="topicId" column="topic_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="uid" column="uid"/>
+        <result property="lat" column="lat"/>
+        <result property="lng" column="lng"/>
+        <result property="address" column="address"/>
+        <result property="status" column="status"/>
+        <result property="limit" column="limit"/>
+        <result property="price" column="price"/>
+        <result property="expiredTime" column="expired_time"/>
+        <result property="payment" column="payment"/>
+        <result property="createTime" column="create_time"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+    <!-- 查询结果映射end -->
+
+</mapper>

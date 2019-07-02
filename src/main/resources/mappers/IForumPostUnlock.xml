@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 帖子解锁记录 -->
+<mapper namespace="fun.billon.forum.dao.IForumPostUnlockDAO">
+
+    <!-- 新增帖子解锁记录 -->
+    <insert id="insertForumPostUnlock" parameterType="ForumPostUnlockModel"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO forum_post_unlock (post_id, uid, unlock_method)
+        VALUES (#{postId}, #{uid}, #{unlockMethod})
+    </insert>
+
+    <!-- 根据条件获取uid集合 -->
+    <select id="queryUidListByCriteria" parameterType="ForumPostUnlockModel"
+            resultType="Integer">
+        SELECT uid FROM forum_post_unlock
+        <where>
+            <if test="postId > 0">
+                post_id = #{postId}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!-- 根据条件获取postId集合 -->
+    <select id="queryPostIdListByCriteria" parameterType="ForumPostUnlockModel"
+            resultType="Integer">
+        SELECT post_id FROM forum_post_unlock
+        <where>
+            uid = #{uid}
+        </where>
+    </select>
+
+    <!-- 根据条件获取主键 -->
+    <select id="queryPKByCriteria" parameterType="ForumPostUnlockModel"
+            resultType="Integer">
+        SELECT id FROM forum_post_unlock
+        <where>
+            post_id = #{postId}
+            AND uid = #{uid}
+            AND unlock_method = #{unlockMethod}
+        </where>
+    </select>
+
+    <!-- 查询字段映射 begin-->
+    <!-- 帖子解锁记录 查询字段映射(forum_post_unlock) -->
+    <sql id="forumPostUnlockMapping">
+        id, post_id, uid, unlock_method, create_time, delete_time
+    </sql>
+    <!-- 查询字段映射 end-->
+
+    <!-- 查询结果映射begin -->
+    <!-- 帖子解锁记录映射 -->
+    <resultMap id="resultForumPostUnlock" type="ForumPostUnlockModel">
+        <id property="id" column="id"/>
+        <result property="postId" column="post_id"/>
+        <result property="uid" column="uid"/>
+        <result property="unlockMethod" column="unlock_method"/>
+        <result property="createTime" column="create_time"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+    <!-- 查询结果映射end -->
+
+
+</mapper>
