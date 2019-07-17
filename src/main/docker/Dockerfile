@@ -1,4 +1,4 @@
-FROM billon/jdk-alpine:8
+FROM registry.cn-beijing.aliyuncs.com/billon379/jdk-alpine:8
 ENV TZ=Asia/Shanghai
 ENV SPRING_PROFILES_ACTIVE=""
 VOLUME /tmp
